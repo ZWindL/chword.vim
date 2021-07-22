@@ -109,6 +109,7 @@ function! chword#e(E=0) abort
     let word = s:cword()
     if !s:isCh(word['cword'])
         " 如果当前词汇非中文且未在 cword 结尾，交由 vim 处理
+        " TODO: 这里可能考虑不全面，中外一同出现的地方会有 bug
         if strchars(word['cword']) !=# word['offset'] + 1
             execute rawCommand
             return
@@ -116,23 +117,22 @@ function! chword#e(E=0) abort
         " 否则先跳转到下一个词
         execute 'normal! w'
     endif
-    " TODO: 这里可能考虑不全面，中外一同出现的地方会有 bug
     " 处理在 cword 词尾的情况
-    if strchars(word['cword']) ==# word['offset'] + 1
-        " 先使用 w 跳转到下一个 cword, 然后移动到词尾部
-        execute 'normal! w'
-        " 处理跳转到下一行并且 cword 只有一个字符的情况
-        let nextWord = s:cword()
-        if strchars(word['cword']) ==# word['offset'] + 1
-            return
-        endif
-    endif
+    "if strchars(word['cword']) ==# word['offset'] + 1
+    "    " 先使用 w 跳转到下一个 cword, 然后移动到词尾部
+    "    execute 'normal! w'
+    "    " 处理跳转到下一行并且 cword 只有一个字符的情况
+    "    let nextWord = s:cword()
+    "    if strchars(word['cword']) ==# word['offset'] + 1
+    "        return
+    "    endif
+    "endif
     " 切割光标后的部分
     let sentenceAfterCursor = strcharpart(word['cword'], word['offset'], maxWordLen)
     " 第一个中文词汇的长度
     let wordLen = s:lenOf1stWord(sentenceAfterCursor)
     " 移动 cursor
-    let word['pos'][2] += (wordLen - 1)
+    let word['pos'][2] += max([wordLen - 1, 1])
     call setcharpos('.', word['pos'])
 endfunction
 
