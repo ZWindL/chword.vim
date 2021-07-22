@@ -16,7 +16,7 @@ function! s:cword() abort
     if col ==# 1
         let rst['offset'] = 0
     else
-        normal b
+        execute "normal! b"
         let beginning = charcol('.')
         let rst['offset'] = col - beginning
         call setcharpos('.', rst['pos'])
@@ -33,8 +33,8 @@ function! s:lenOf1stWord(sentence) abort
     " TODO: 加入贪心/非贪心的控制选项
     let maxWordLen = 6
     let chars = []
-    for ch in a:sentence
-        let chars += [ch]
+    for c in a:sentence
+        let chars = add(chars, c)
         if chdict#isChWord(join(chars, ''))
             return len(chars)
         endif
@@ -61,6 +61,7 @@ function! s:lenOfLastWord(sentence) abort
             break
         endif
         let maxWordLen -= 1
+        let i -= 1
     endwhile
     return 1
 endfunction
@@ -155,7 +156,7 @@ function! chword#b(B=0) abort
         return
     endif
     " 切割光标前的部分
-    let length = min([word['offset']+1, maxWordLen])
+    let length = min([word['offset'] + 1, maxWordLen])
     let beginning = word['offset'] + 1 - length
     let sentenceBeforeCursor = strcharpart(word['cword'], beginning, length)
     " 前一个中文词汇的长度

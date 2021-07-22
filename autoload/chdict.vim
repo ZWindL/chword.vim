@@ -17,6 +17,7 @@ endfunction
 
 " check if a word is in dict
 function! chdict#isChWord(word) abort
+    "echomsg a:word
     return get(s:dict, a:word, 0) ==# 1
 endfunction
 
